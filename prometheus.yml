@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'lambdaban'
+    static_configs:
+      - targets: ['lambdaban:3002']

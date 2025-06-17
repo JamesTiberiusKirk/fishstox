@@ -1,0 +1,23 @@
+package components
+
+import "net/http"
+
+templ ServerError(r *http.Request, message string) {
+	@Layout(r) {
+		<div class={ "cs-panel", panel() }>
+			<h1>INTERNAL SERVER ERROR</h1>
+			<h2>{ message }</h2>
+			<p>soz</p>
+		</div>
+	}
+}
+
+css panel() {
+	display: flex;
+	flex-direction: column;
+	width: 33%;
+	min-width: 373px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 5em;
+}

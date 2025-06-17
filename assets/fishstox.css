@@ -1,0 +1,143 @@
+/* Fishtank.live Inspired CSS */
+
+/* Import a pixel font (like Press Start 2P from Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --background: #101014;
+  --panel-bg: #18181e;
+  --border-neon: #00f0ff;
+  --accent: #00f0ff;
+  --accent2: #ff00c8;
+  --text-main: #ffffff;
+  --text-muted: #a0a0b0;
+}
+
+body {
+  background: var(--background);
+  color: var(--text-main);
+  font-family: 'Press Start 2P', monospace, 'Courier New', Courier;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+header, .navbar {
+  background: var(--panel-bg);
+  border-bottom: 4px solid var(--border-neon);
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent2);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  background: var(--panel-bg);
+  border: 2px solid var(--border-neon);
+  border-radius: 8px;
+  box-shadow: 0 0 20px 2px var(--border-neon);
+  padding: 2rem;
+}
+
+.panel {
+  background: var(--background);
+  border: 2px solid var(--accent2);
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  box-shadow: 0 0 10px 2px var(--accent2);
+}
+
+h1, h2, h3, h4, h5 {
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent2);
+  font-family: 'Press Start 2P', monospace;
+  margin-top: 0;
+}
+
+a {
+  color: var(--accent2);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent2);
+}
+
+.button, button {
+  background: var(--accent2);
+  color: #fff;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  font-family: 'Press Start 2P', monospace;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--accent2);
+  transition: background 0.2s, color 0.2s;
+}
+
+.button:hover, button:hover {
+  background: var(--accent);
+  color: var(--accent2);
+}
+
+input, textarea {
+  background: var(--background);
+  color: var(--text-main);
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  font-family: 'Press Start 2P', monospace;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  background: var(--panel-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent2);
+  border-radius: 8px;
+  box-shadow: 0 0 8px var(--accent2);
+}
+
+.chat {
+  background: var(--background);
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  padding: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+}
+
+.chat-message {
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
+  text-shadow: 0 0 3px var(--accent2);
+}
+
+.chat-message .username {
+  color: var(--accent2);
+  margin-right: 0.5rem;
+}
+
+.footer {
+  background: var(--panel-bg);
+  border-top: 4px solid var(--border-neon);
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 2rem;
+}

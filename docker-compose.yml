@@ -1,0 +1,30 @@
+services:
+  db:
+    image: 'postgres:latest'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB", ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./.docker-volumes/db:/var/lib/postgresql/data/
+
+  scraper:
+    build:
+      context: .
+      dockerfile: ./cmd/scraper/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: db
+      DB_PORT: 5432

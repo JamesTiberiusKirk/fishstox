@@ -1,0 +1,47 @@
+package components
+
+import "net/http"
+import "github.com/JamesTiberiusKirk/fishstox/internal/config"
+
+templ Layout(r *http.Request) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title>Todos</title>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<link rel="stylesheet" type="text/css" href="assets/fishstox.css"/>
+			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+			<script src="https://unpkg.com/htmx-ext-sse@2.2.2"></script>
+			<!-- <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/debug.js"></script> -->
+			<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+			<script src="https://unpkg.com/alpinejs" defer></script>
+		</head>
+		<body>
+			<div class="layout">
+				<div style="display: flex;">
+					<a href="/" style="display: flex;">
+						<img
+							style="margin-top: auto; margin-bottom: auto;"
+							src="/assets/lambda.png"
+							alt="Lambda"
+							width="30"
+							height="30"
+						/>
+						<h1 class="noDecoration" style="color: var(--text); text-decoration: none; /* no underline */ padding-left: 10px;">LambdaBan</h1>
+					</a>
+				</div>
+				{ children... }
+			</div>
+			<div class={ version() }>
+				Ver: { config.Version }
+			</div>
+		</body>
+	</html>
+}
+
+css version() {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	z-index: 100;
+}

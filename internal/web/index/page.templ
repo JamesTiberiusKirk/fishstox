@@ -1,0 +1,14 @@
+package index
+
+import "net/http"
+import "github.com/JamesTiberiusKirk/fishstox/internal/components"
+
+templ page(r *http.Request) {
+	@components.Layout(r) {
+		<div class={ panel() }>
+		</div>
+	}
+}
+
+css panel() {
+}
