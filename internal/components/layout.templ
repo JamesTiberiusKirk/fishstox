@@ -1,9 +1,12 @@
 package components
 
 import "net/http"
-import "github.com/JamesTiberiusKirk/fishstox/internal/config"
 
-templ Layout(r *http.Request) {
+type LayoutProps struct {
+	ImportChartjs bool
+}
+
+templ Layout(r *http.Request, props LayoutProps) {
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -15,33 +18,38 @@ templ Layout(r *http.Request) {
 			<!-- <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/debug.js"></script> -->
 			<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 			<script src="https://unpkg.com/alpinejs" defer></script>
+			if props.ImportChartjs {
+				<script src="https://cdn.jsdelivr.net/npm/chart.js@^3"></script>
+				<script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
+				<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
+				<script src="/assets/chart-fin.js" type="text/javascript"></script>
+			}
 		</head>
-		<body>
-			<div class="layout">
+		<body class={ body() }>
+			<div class={ layout() }>
 				<div style="display: flex;">
 					<a href="/" style="display: flex;">
-						<img
-							style="margin-top: auto; margin-bottom: auto;"
-							src="/assets/lambda.png"
-							alt="Lambda"
-							width="30"
-							height="30"
-						/>
-						<h1 class="noDecoration" style="color: var(--text); text-decoration: none; /* no underline */ padding-left: 10px;">LambdaBan</h1>
+						<h1 class="noDecoration" style="color: var(--text); text-decoration: none; /* no underline */ padding-left: 10px;">FishStox</h1>
 					</a>
 				</div>
 				{ children... }
-			</div>
-			<div class={ version() }>
-				Ver: { config.Version }
 			</div>
 		</body>
 	</html>
 }
 
-css version() {
-	position: absolute;
-	bottom: 10px;
-	left: 10px;
-	z-index: 100;
+css body() {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+css layout() {
+	flex: 1;
+	padding: 1em;
+	display: flex;
+	flex-direction: column;
 }

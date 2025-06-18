@@ -1,0 +1,18 @@
+package simple 
+
+import (
+	"github.com/JamesTiberiusKirk/fishstox/internal/components"
+	"github.com/JamesTiberiusKirk/fishstox/internal/models"
+	"net/http"
+)
+
+// pageProps contains data to render on the page
+type pageProps struct {
+	tickerQuery string
+	prices      []models.StockPrice
+}
+
+// templ page renders the page template
+templ page(r *http.Request, props pageProps) {
+	@components.SimpleGraph(components.SimpleGraphProps{ID: props.tickerQuery, Prices: props.prices, TickerQuery: props.tickerQuery})
+}

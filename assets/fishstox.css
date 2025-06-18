@@ -141,3 +141,27 @@ input, textarea {
   font-size: 0.8rem;
   margin-top: 2rem;
 }
+
+/* A clean border with rounded corners and a subtle shadow */
+.border {
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 8px;      /* Slightly rounded corners */
+    padding: 10px;           /* Add some padding inside the element */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Soft shadow for subtle depth */
+}
+
+/* If you want to make the border color more pronounced (e.g., dark theme or accent colors) */
+.border-dark {
+    border: 1px solid #444; /* Darker border */
+}
+
+/* Border with a hover effect */
+.border-hover:hover {
+    border-color: #007bff;  /* Change border color on hover to a blue accent */
+    box-shadow: 0 4px 6px rgba(0, 123, 255, 0.1); /* Slightly more intense shadow on hover */
+}
+
+/* For a more subtle effect */
+.border-light {
+    border: 1px solid #e0e0e0; /* Very light gray border */
+}

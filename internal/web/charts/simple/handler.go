@@ -1,4 +1,4 @@
-package index
+package simple
 
 import (
 	"net/http"
@@ -33,9 +33,13 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) get(w http.ResponseWriter, r *http.Request) {
-	tickerQuery := r.URL.Query().Get("tickerQuery")
+	time.Sleep(5 * time.Second)
+
+	tickerQuery := r.PathValue("tickerQuery")
 	if tickerQuery == "" {
-		tickerQuery = "DRNC"
+		w.WriteHeader(http.StatusNotFound)
+		components.NotFound(r, "Ticker not found").Render(r.Context(), w)
+		return
 	}
 
 	from := time.Now().Add(-24 * time.Hour)
@@ -44,6 +48,7 @@ func (h *handler) get(w http.ResponseWriter, r *http.Request) {
 	rawPrices, err := h.db.GetStockPricesByTimeFrame(tickerQuery, from, to)
 	if err != nil {
 		slogctx.Ctx(r.Context()).Error("Error getting prices", "ticker", tickerQuery, "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
 		components.ServerError(r, err.Error()).Render(r.Context(), w)
 		return
 	}
@@ -56,25 +61,25 @@ func (h *handler) get(w http.ResponseWriter, r *http.Request) {
 		amountOfPrices, err = strconv.Atoi(amountOfPricesRaw)
 		if err != nil {
 			slogctx.Ctx(r.Context()).Error("Error converting amount of prices", "amountOfPricesRaw", amountOfPricesRaw, "error", err)
+			w.WriteHeader(http.StatusInternalServerError)
 			components.ServerError(r, err.Error()).Render(r.Context(), w)
 			return
 		}
 	}
 
-	prices, err := prices.ConcatAndAverage(rawPrices, amountOfPrices, from, to)
+	p, err := prices.ConcatAndAverage(rawPrices, amountOfPrices, from, to)
 	if err != nil {
 		slogctx.Ctx(r.Context()).Error("Error processing prices", "ticker", tickerQuery, "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
 		components.ServerError(r, err.Error()).Render(r.Context(), w)
 		return
 	}
 
 	pageData := pageProps{
-		tickerQuery:    tickerQuery,
-		amountOfPrices: amountOfPrices,
-		from:           from,
-		to:             to,
-		prices:         prices,
+		tickerQuery: tickerQuery,
+		prices:      p,
 	}
 
+	w.WriteHeader(http.StatusOK)
 	page(r, pageData).Render(r.Context(), w)
 }

@@ -1,0 +1,93 @@
+package components
+
+import "github.com/JamesTiberiusKirk/fishstox/internal/models"
+import "github.com/JamesTiberiusKirk/fishstox/internal/util"
+
+var simpleGraphHandle = templ.NewOnceHandle()
+
+type SimpleGraphProps struct {
+	ID          string
+	Prices      []models.StockPrice
+	TickerQuery string
+}
+
+templ SimpleGraph(props SimpleGraphProps) {
+	<div style="width: 100%; height: 400px;">
+		<canvas id={ props.ID + "_simple-chart" } style="width: 100%; height: 100%;"></canvas>
+	</div>
+	@simpleGraphHandle.Once() {
+		<script>
+                function initChart(canvasID, chartDataString, ticker) {
+                    const chartData = JSON.parse(chartDataString);
+
+                    // Ensure timestamps and values are properly aligned
+                    if (chartData.timestamps.length !== chartData.values.length) {
+                        console.error("Mismatched timestamps and values arrays");
+                        return;
+                    }
+
+                    // Convert raw timestamps (in milliseconds) to DateTime objects
+                    const timestamps = chartData.timestamps.map(timestamp => {
+                        const validTimestamp = Number(timestamp);
+                        if (isNaN(validTimestamp)) {
+                            console.error("Invalid timestamp:", timestamp);
+                            return null;
+                        }
+                        const dt = luxon.DateTime.fromMillis(validTimestamp);
+                        return dt.isValid ? dt.toMillis() : null;
+                    }).filter(ts => ts !== null);
+
+                    new Chart(document.getElementById(canvasID), {
+                        type: 'line',
+                        data: {
+                            labels: timestamps,  // Use the converted timestamps
+                            datasets: [{
+                                label: ticker,
+                                data: chartData.values,  // Ensure this is correctly aligned with timestamps
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                fill: true,
+                            }],
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'minute',
+                                        tooltipFormat: 'll HH:mm',
+                                        displayFormats: {
+                                            minute: 'dd/MM HH:mm',
+                                            hour: 'dd/MM HH:mm',
+                                            day: 'dd/MM',
+                                        }
+                                    },
+                                    ticks: {
+                                        source: 'data',
+                                        callback: function(value, index, values) {
+                                            return value
+                                        }
+                                    },
+                                },
+                                y: {
+                                    beginAtZero: false,
+                                },
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(tooltipItem) {
+                                            const date = luxon.DateTime.fromMillis(tooltipItem.raw.x);
+                                            return date.isValid ? `${date.toFormat('dd/MM HH:mm')}: ₣${tooltipItem.raw.y}` : '';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                </script>
+	}
+	@templ.JSFuncCall("initChart", props.ID+"_simple-chart", util.GenerateChartData(props.Prices), props.TickerQuery)
+}

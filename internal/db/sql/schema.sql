@@ -2,7 +2,7 @@
 CREATE TABLE tickers (
     ticker     VARCHAR(10)    NOT NULL,
     timestamp  BIGINT         NOT NULL,
-    value      NUMERIC(10, 2) NOT NULL,
+    value      INTEGER        NOT NULL,
 
     PRIMARY KEY (ticker, timestamp)
 );

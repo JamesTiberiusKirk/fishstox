@@ -1,0 +1,107 @@
+package candlestick
+
+import (
+	"github.com/JamesTiberiusKirk/fishstox/internal/models"
+	"net/http"
+)
+
+// pageProps contains data to render on the page
+type pageProps struct {
+	tickerQuery string
+	candles     []models.Candle
+}
+
+// templ page renders the page template
+templ page(r *http.Request, props pageProps) {
+	<div style="width:1000px">
+		<canvas id="chart"></canvas>
+	</div>
+	<script>
+
+    // var barCount = 60;
+    // var initialDateStr = new Date().toUTCString();
+
+
+    function initFinChart(canvasId, barData){
+	// var barData = new Array(barCount);
+	var lineData = new Array(barData.lenght);
+	// getRandomData(initialDateStr);
+
+
+	// bar data
+	// {
+	//  x: date.valueOf(),
+	//  o: open,
+	//  h: high,
+	//  l: low,
+	//  c: close
+	// }
+
+	console.log(barData)
+
+	// Convert raw timestamps (in milliseconds) to DateTime objects
+	const timestamps = barData.map(bd => {
+	    const validTimestamp = Number(bd.x);
+	    if (isNaN(validTimestamp)) {
+		console.error("Invalid timestamp:", bd.x);
+		return null;
+	    }
+	    const dt = luxon.DateTime.fromMillis(validTimestamp);
+	    return dt.isValid ? dt.toMillis() : null;
+	}).filter(ts => ts !== null);
+
+	var chart = new Chart(document.getElementById(canvasId), {
+	    type: 'candlestick',
+	    data: {
+		datasets: [{
+		    label: 'CHRT - Chart.js Corporation',
+		    data: barData,
+		}, {
+			label: 'Close price',
+			type: 'line',
+			data: timestamps,
+			hidden: true,
+		    }]
+	    },
+	    options: {
+		responsive: true,
+		scales: {
+		    x: {
+			type: 'time',
+			time: {
+			    unit: 'minute',
+			    tooltipFormat: 'll HH:mm',
+			    displayFormats: {
+				minute: 'dd/MM HH:mm',
+				hour: 'dd/MM HH:mm',
+				day: 'dd/MM',
+			    }
+			},
+			ticks: {
+			    source: 'data',
+			    callback: function(value, index, values) {
+				return value
+			    }
+			},
+		    },
+		    y: {
+			beginAtZero: false,
+		    },
+		},
+		plugins: {
+		    tooltip: {
+			callbacks: {
+			    label: function(tooltipItem) {
+				const date = luxon.DateTime.fromMillis(tooltipItem.raw.x);
+				return date.isValid ? `${date.toFormat('dd/MM HH:mm')}: ₣${tooltipItem.raw.y}` : '';
+			    }
+			}
+		    }
+		}
+	    }
+	});
+    }
+
+    </script>
+	@templ.JSFuncCall("initFinChart", "chart", props.candles)
+}

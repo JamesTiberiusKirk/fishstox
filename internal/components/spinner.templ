@@ -1,0 +1,34 @@
+package components
+
+
+
+
+
+templ Spinner() {
+	<style>
+	@keyframes spin {
+	to {
+	transform: rotate(360deg);
+	}
+	}
+
+	.spin {
+	transform-origin: center;
+	animation: spin 1s linear infinite;
+	}
+	</style>
+	<svg style="width: 150px; height: 150px; margin-right: auto;" class="htmx-indicator" id="spinner" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+		<circle
+			class="spin"
+			cx="400"
+			cy="400"
+			fill="none"
+			r="126"
+			stroke-width="25"
+			stroke="#c30dfb"
+			stroke-dasharray="89 1400"
+			stroke-linecap="round"
+		></circle>
+	</svg>
+
+}

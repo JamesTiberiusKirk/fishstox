@@ -2,11 +2,13 @@ package components
 
 import "net/http"
 
-templ ServerError(r *http.Request, message string) {
+templ NotFound(r *http.Request, message string) {
 	@Layout(r, LayoutProps{}) {
 		<div class={ "cs-panel", panel() }>
-			<h1>INTERNAL SERVER ERROR</h1>
-			<h2>{ message }</h2>
+			<h1>404 Not Found</h1>
+			if message != "" {
+				<h2>{ message }</h2>
+			}
 			<p>soz</p>
 		</div>
 	}

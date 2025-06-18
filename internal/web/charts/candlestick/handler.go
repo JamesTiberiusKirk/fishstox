@@ -1,8 +1,8 @@
-package index
+package candlestick
 
 import (
+	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/JamesTiberiusKirk/fishstox/internal/components"
@@ -33,9 +33,11 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) get(w http.ResponseWriter, r *http.Request) {
-	tickerQuery := r.URL.Query().Get("tickerQuery")
+	tickerQuery := r.PathValue("tickerQuery")
 	if tickerQuery == "" {
-		tickerQuery = "DRNC"
+		w.WriteHeader(http.StatusNotFound)
+		components.NotFound(r, "Ticker not found").Render(r.Context(), w)
+		return
 	}
 
 	from := time.Now().Add(-24 * time.Hour)
@@ -44,37 +46,27 @@ func (h *handler) get(w http.ResponseWriter, r *http.Request) {
 	rawPrices, err := h.db.GetStockPricesByTimeFrame(tickerQuery, from, to)
 	if err != nil {
 		slogctx.Ctx(r.Context()).Error("Error getting prices", "ticker", tickerQuery, "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
 		components.ServerError(r, err.Error()).Render(r.Context(), w)
 		return
 	}
 
-	amountOfPricesRaw := r.URL.Query().Get("amountOfPrices")
-	amountOfPrices := 0
-	if amountOfPricesRaw == "" {
-		amountOfPrices = 24
-	} else {
-		amountOfPrices, err = strconv.Atoi(amountOfPricesRaw)
-		if err != nil {
-			slogctx.Ctx(r.Context()).Error("Error converting amount of prices", "amountOfPricesRaw", amountOfPricesRaw, "error", err)
-			components.ServerError(r, err.Error()).Render(r.Context(), w)
-			return
-		}
-	}
-
-	prices, err := prices.ConcatAndAverage(rawPrices, amountOfPrices, from, to)
+	interval := 3600000 // 1 hour in milliseconds
+	candles, err := prices.CalculateCandlestick(rawPrices, interval)
 	if err != nil {
 		slogctx.Ctx(r.Context()).Error("Error processing prices", "ticker", tickerQuery, "error", err)
+		w.WriteHeader(http.StatusInternalServerError)
 		components.ServerError(r, err.Error()).Render(r.Context(), w)
 		return
 	}
 
+	fmt.Println(len(candles))
+
 	pageData := pageProps{
-		tickerQuery:    tickerQuery,
-		amountOfPrices: amountOfPrices,
-		from:           from,
-		to:             to,
-		prices:         prices,
+		tickerQuery: tickerQuery,
+		candles:     candles,
 	}
 
+	w.WriteHeader(http.StatusOK)
 	page(r, pageData).Render(r.Context(), w)
 }

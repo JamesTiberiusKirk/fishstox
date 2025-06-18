@@ -1,14 +1,52 @@
 package index
 
-import "net/http"
-import "github.com/JamesTiberiusKirk/fishstox/internal/components"
+import (
+	"github.com/JamesTiberiusKirk/fishstox/internal/components"
+	"github.com/JamesTiberiusKirk/fishstox/internal/models"
+	"net/http"
+	"strconv"
+	"time"
+)
 
-templ page(r *http.Request) {
-	@components.Layout(r) {
-		<div class={ panel() }>
-		</div>
-	}
+// pageProps contains data to render on the page
+type pageProps struct {
+	tickerQuery    string
+	amountOfPrices int
+	from, to       time.Time
+	prices         []models.StockPrice
+	chartData      string
 }
 
-css panel() {
+// templ page renders the page template
+templ page(r *http.Request, props pageProps) {
+	@components.Layout(r, components.LayoutProps{ImportChartjs: true}) {
+		<div style="width:700px;">
+			<form hx-get hx-swap="body" hx-target="body">
+				<div>
+					<label for="tickerQuery">Ticker:</label>
+					<input name="tickerQuery" type="text" value={ props.tickerQuery }/>
+				</div>
+				<div>
+					<label for="amountOfPrices">Amount of prices:</label>
+					<input name="amountOfPrices" type="number" value={ strconv.Itoa(props.amountOfPrices) }/>
+				</div>
+				<div style="width:100%;">
+					<input style="width:100%;" value="Submit" type="submit"/>
+				</div>
+			</form>
+		</div>
+		<p>Query: { props.tickerQuery }</p>
+		<p>Amount of prices: { strconv.Itoa(len(props.prices)) }</p>
+		<p>From: { props.from.Format("02-01 15:04:05") } To: { props.to.Format("02-01 15:04:05") }</p>
+		<p>From: { strconv.Itoa(int(props.from.UnixNano() / int64(time.Millisecond))) } To: { strconv.Itoa(int(props.to.UnixNano() / int64(time.Millisecond))) }</p>
+		<div
+			hx-get={ "/charts/candlestick/" + props.tickerQuery + "?amountOfPrices=" + strconv.Itoa(props.amountOfPrices) }
+			hx-swap="innerHTML"
+			hx-trigger="load"
+			hx-indicator="#spinner"
+			class="border-dark"
+		>
+			@components.Spinner()
+		</div>
+	}
 }
